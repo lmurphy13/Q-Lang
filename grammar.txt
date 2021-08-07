@@ -1,0 +1,38 @@
+BNF Grammar for the "Q" Programming Language
+Non-Terminals          
+                <Program> ::= <MainFunctionDeclaration> ( <FunctionDeclaration> )* <EOF>
+<MainFunctionDeclaration> ::= "func" "int" "main" "(" ")" "{" (<VariableDeclaration>)* (<Statement>)* "}"
+    <VariableDeclaration> ::= <Type> <ID> (":=" <Expression> )? ";"
+    <FunctionDeclaration> ::= "func" <Type> <ID> "(" (<Type> <ID> ( "," <Type> <ID> )* )? ")" "{" (<VariableDeclaration>)* (<Statement>)* "return" <Expression> ";" "}"
+        <VoidDeclaration> ::= "func" "void" <ID> "(" ")" "{" (<VariableDeclaration>)* (<Statement>)* "}"
+                   <Type> ::= <Type> ( "[""]" )*
+                           | "bool"
+                           | "int"
+                           | "float"
+                           | "string"
+                           | <ID>
+              <Statement> ::= "{" ( <Statement> )* "}"
+                           | "if" "(" <Expression> ")" <Statement> ( "else" <Statement> )?
+                           | "while" "(" <Expression> ")" <Statement>
+                           | <Expression> ":=" <Expression> ";"
+             <Expression> ::= <Expression> "||" <Expression>
+                           | <Expression> "&&" <Expression>
+                           | <Expression> "==" <Expression>
+                           | <Expression> ">" <Expression>
+                           | <Expression> "<" <Expression>
+                           | <Expression> "+" <Expression>
+                           | <Expression> "-" <Expression>
+                           | <Expression> "*" <Expression>
+                           | <Expression> "/" <Expression>
+                           | <Expression> "%" <Expression>
+                           | <Expression> "[" <Expression> "]"
+                           | "-" <Expression>
+                           | "!" <Expression>
+                           | "(" <Expression ")"
+                           | <ID>
+                           | <INT>
+                           | <FLOAT>
+                           | <STRING>
+                           | "true"
+                           | "false"
+                           | "NULL"

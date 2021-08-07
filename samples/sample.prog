@@ -1,0 +1,8 @@
+func int main() {
+	int a := 4;
+	bool b := true;
+	float c := 3.14;
+	string hi := "hi";
+
+	int sum := 3 + a;
+}
