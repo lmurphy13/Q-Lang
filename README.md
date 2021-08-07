@@ -1,5 +1,5 @@
 # Q-Lang
-Source code for my Q Programming language. 
+Source code for my Q Programming Language. 
 
 ## Background
 
