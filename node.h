@@ -13,7 +13,7 @@
 class CodeGenContext;
 class NStatement;
 class NExpression;
-class NVariableDecl;
+class NVariableDeclaration;
 
 typedef std::vector<NStatement*> StatementList;
 typedef std::vector<NExpression*> ExpressionList;
@@ -80,9 +80,41 @@ class NAssignment : public NExpression {
 		virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-class 
+class NBlock : public NExpression {
+	public:
+		StatementList statements;
+		NBlock() { }
+		virtual llvm::Value* codeGen(CodeGenContext& context);	
+}; 
 
+class NExpressionStatement : public NStatement {
+	public:
+		NExpression& expression;
+		NExpressionStatement(NExpression &expression) :
+			expression(expression) { }
+		virtual llvm::Value* codeGen(CodeGenContext& context);
+};
 
+class NVariableDelcaration : public NStatement {
+	public:
+		const NIdentifier& type;
+		NIdentifier& id;
+		NExpression *assignmentExpr;
+		NVariableDeclaration(const NIdentifier& type, NIdentifier& id) :
+			type(type), id(id) { }
+		NVariableDeclaration(const NIdentifier& type, NIdentifier& id, NExpression* assignmentExpr) :
+			type(type), id(id), assignmentExpr(assignmentExpr) { }
+		virtual llvm::Value* codeGen(CodeGenContext& context);
+};
 
-
-
+class NFunctionDeclaration : public NStatement {
+	public:
+		const NIdentifier& type;
+		const NIdentifier& id;
+		VariableList arguments;
+		NBlock& block;
+		NFunctionDeclaration(const NIdentifier& type, const NIdentifier& id,
+				const VariableList& arguments, NBlock& block) :
+			type(type), id(id), arguments(arguments), block(block) { }
+		virtual llvm::Value* codeGen(CodeGenContext& context); 
+};
