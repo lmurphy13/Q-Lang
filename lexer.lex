@@ -1,17 +1,57 @@
 /*
- * Sample Scanner
+ * lexer.lex
+ *
+ * Lexical Analyzer for the Q Programming Language
+ * Adapted from: https://gnuu.org/2009/09/18/writing-your-own-toy-compiler/
+ * Author: Liam M. Murphy
  */
 
 %{
-#include <stdio.h
+#include <string>
+#include "node.h"
+#include "parser.cpp"
+#define SAVE_TOKEN yylval.string = new std::string(yytext, yyleng)
+#define TOKEN(t) (yylval.token = t)
 
-%option noyywrap
+extern "C" int yywrap() { }
 %}
 
 %%
 
+[ \t\n]						;
+[a-zA-Z_][a-zA-Z0-9_]*		SAVE_TOKEN; return ID;
+[0-9]+.[0-9]*				SAVE_TOKEN; return TFLOAT;
+[0-9]+						SAVE_TOKEN; return TINTEGER;
 
-"+"		{ printf("PLUS\n"); 		return PLUS;  	} 
+":="						return TOKEN(ASSIGN);
+"=="						return TOKEN(EQUAL);
+"+"							return TOKEN(PLUS);
+"-"							return TOKEN(MINUS);
+"*"							return TOKEN(STAR);
+"/"							return TOKEN(SLASH);
+"%"							return TOKEN(PERCENT);
+"("							return TOKEN(LPAREN);
+")"							return TOKEN(RPAREN):
+"{"							return TOKEN(LBRACE);
+"}"							return TOKEN(RBRACE);
+"["							return TOKEN(LBRACKET);
+"]"							return TOKEN(RBRACKET);
+"."							return TOKEN(DOT);
+","							return TOKEN(COMMA);
+";"							return TOKEN(SEMICOLON);
+"<"							return TOKEN(LTHAN);
+">"							return TOKEN(GTHAN);
+"<="						return TOKEN(LEQUALS);
+">="						return TOKEN(GEQUALS);
+"!"							return TOKEN(BANG);
+"!="						return TOKEN(NEQUALS);
+.							printf("Unknown token!\n"); yyterminate();
+
+
+
+/*
+
+"+"		{ printf("PLUS\n"); 		return PLUS;  	}
 "-"		{ printf("MINUS\n"); 		return MINUS; 	}
 "*"		{ printf("MULT\n");			return STAR;  	}
 "/"		{ printf("SLASH\n");		return SLASH; 	}
@@ -50,11 +90,13 @@
 digit		[0-9
 char		[a-zA-Z]
 
+*/
+
 %%
 
 
-
-
+/*
+ 
 {char}({char}|{digit})* 
 		yylval.id = strdup(yytex
 		printf("string(%s)\n", yytext);
@@ -69,7 +111,10 @@ char		[a-zA-Z]
 {digit}+"."{digit}+ { yylval.num = atof(yytext);
 		printf("FNUMBER(%s)\n", yytext);
 		}
+*/
 
-[ \t\r]  /* skip whitespace */
-.		{ printf("Unknown character [%c]", yytext[0]);}
+/*
+// [ \t\r]  // skip whitespace 
+// .		{ printf("Unknown character [%c]", yytext[0]);}
+
 %%
