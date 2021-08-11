@@ -1,7 +1,10 @@
 %{
 	#include <stdio.h>
 	#include <string.h>
+	#include "node.h"
 	#define YYSTYPE double /* double type for yacc stack */
+
+	NBlock *programBlock;	/* top level root node of AST */
 
 	void yyerror(const char *str) {
 		fprintf(stderr, "error: %s\n", str);
@@ -11,59 +14,69 @@
 		return 1;
 	}
 
-	int yylex();
-
-	main() {
-		yyparse();
-	}
+	extern int yylex();
 %}
-%start Program
-%token PLUS
-%token MINUS
-%token MULT
-%token SLASH
-%token MOD
-%token LPAREN
-%token RPAREN
-%token LBRACKET
-%token RBRACKET
-%token LBRACE
-%token RBRACE
-%token SEMICOLON
-%token DOT
-%token COMMA
-%token ASSIGN
-%token EQUALS
-%token LTHAN
-%token GTHAN
-%token LEQUALS
-%token GEQUALS
-%token BANG
-%token NEQUALS
-%token FUNC
-%token IF
-%token ELSE
-%token WHILE
-%token RETURN
-%token BOOLEAN
-%token INTEGER
-%token FLOAT
-%token STRING
-%token VOID
-%token TRUE
-%token FALSE
-%token NULL
 
-%left '+' '-'
-%left '*' '/' '%'
+%union {
+	Node *node;
+	NBlock *block;
+	NExpression *expr;
+	NStatement *stmt;
+	NIdentifier *ident;
+	NVariableDeclaration *varDecl;
+	std::vector<NVariableDeclaration*> *varVec;
+	std::vector<NExpression*> *exprVec;
+	std::vector<NStatement*> *stmtVec;
+	int token;
+}
+
+%token <string> TID TFLOAT TINTEGER TBOOLEAN TSTRING
+%token <token> PLUS
+%token <token> MINUS
+%token <token> STAR
+%token <token> SLASH
+%token <token> PERCENT
+%token <token> LPAREN
+%token <token> RPAREN
+%token <token> LBRACKET
+%token <token> RBRACKET
+%token <token> LBRACE
+%token <token> RBRACE
+%token <token> SEMICOLON
+%token <token> DOT
+%token <token> COMMA
+%token <token> ASSIGN
+%token <token> EQUAL
+%token <token> LTHAN
+%token <token> GTHAN
+%token <token> LEQUALS
+%token <token> GEQUALS
+%token <token> BANG
+%token <token> NEQUALS
+%token <token> AND
+%token <token> OR
+%token <token> FUNC
+%token <token> IF
+%token <token> ELSE
+%token <token> WHILE
+%token <token> RETURN
+%token <token> VOID;
+%token <token> EOF;
+
+%left PLUS MINUS
+%left STAR SLASH PERCENT
+
+%start Program
 
 %% /*** Grammar Rules will go here ***/
 
-Program		: MainFunctionDeclaration FunctionDeclarationList EOF;
+Program	: MainFunctionDeclaration FunctionDeclarationList EOF { programBlock = $1; programBlock->statements = $2; }
 
 FunctionDeclarationList : FunctionDeclarationList FunctionDeclaration;
+						|
+						;
 
-MainFunctionDeclaration : FUNC INTEGER "main" LPAREN RPAREN LBRACE VariableDeclarationList StatementList RBRACE;
+MainFunctionDeclaration : FUNC "int" "main" LPAREN RPAREN LBRACE VariableDeclarationList StatementList RBRACE;
 
 VariableDeclarationList : VariableDeclarationList VariableDeclaration
 						|
@@ -73,21 +86,28 @@ StatementList : StatementList Statement
 			  |
 			  ;
 
-VariableDeclaration : Type ID SEMICOLON
-					| Type ID ASSIGN Expression SEMICOLON
+VariableDeclaration : Type TID SEMICOLON
+					| Type TID ASSIGN Expression SEMICOLON
 					;
 
-FunctionDeclaration : FUNC Type ID LPAREN ( Type ID ( COMMA Type ID )* )? RPAREN LBRACE VariableDeclarationList StatementList RETURN Expression SEMICOLON RBRACE;
+FunctionDeclaration : FUNC Type TID LPAREN RPAREN LBRACE VariableDeclarationList StatementList RETURN Expression SEMICOLON RBRACE
+					| FUNC Type TID LPAREN Type TID COMMA TypeList RPAREN LBRACE VariableDeclarationList StatementList RETURN Expression SEMICOLON RBRACE
+					| FUNC Type TID LPAREN Type TID RPAREN LBRACE VariableDeclarationList StatementList RETURN Expression SEMICOLON RBRACE
+					;
 
-VoidDeclaration : FUNC VOID ID LPAREN RPAREN LBRACE VariableDeclarationList StatementList RBRACE;
+TypeList : COMMA TypeList Type
+		 | COMMA Type
+		 ;
+
+VoidDeclaration : FUNC VOID TID LPAREN RPAREN LBRACE VariableDeclarationList StatementList RBRACE;
 
 Type : Type
 	 | Type LBRACKET Expression RBRACKET
-	 | BOOLEAN
-	 | INTEGER
-	 | FLOAT
-	 | STRING
-	 | ID
+	 | TBOOLEAN
+	 | TINTEGER
+	 | TFLOAT
+	 | TSTRING
+	 | TID
 	 ;
 
 Statement : LBRACE StatementList RBRACE
@@ -99,3 +119,17 @@ Statement : LBRACE StatementList RBRACE
 IfStatement : IF LPAREN Expression RPAREN Statement
 			| IF LPAREN Expression RPAREN Statement ELSE Statement
 			;
+
+Expression : Expression OR Expression
+		   | Expression AND Expression
+		   | Expression EQUAL Expression
+		   | Expression GTHAN Expression
+		   | Expression LTHAN Expression
+		   | Expression PLUS Expression
+		   | Expression MINUS Expression
+		   | Expression STAR Expression
+		   | Expression SLASH Expression
+		   | Expression PERCENT Expression
+		   | MINUS Expression
+		   | BANG Expression
+		   ;

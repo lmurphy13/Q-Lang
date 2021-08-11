@@ -19,9 +19,11 @@ extern "C" int yywrap() { }
 %%
 
 [ \t\n]						;
-[a-zA-Z_][a-zA-Z0-9_]*		SAVE_TOKEN; return ID;
+[a-zA-Z_][a-zA-Z0-9_]*		SAVE_TOKEN; return TID;
 [0-9]+.[0-9]*				SAVE_TOKEN; return TFLOAT;
 [0-9]+						SAVE_TOKEN; return TINTEGER;
+[true|false]				SAVE_TOKEN; return TBOOLEAN;
+\"[^"\n]*["\n] 				SAVE_TOKEN; return TSTRING;
 
 ":="						return TOKEN(ASSIGN);
 "=="						return TOKEN(EQUAL);
@@ -39,12 +41,23 @@ extern "C" int yywrap() { }
 "."							return TOKEN(DOT);
 ","							return TOKEN(COMMA);
 ";"							return TOKEN(SEMICOLON);
+"\'"						return TOKEN(APOSTROPHE);
+"\""						return TOKEN(QUOTE);
 "<"							return TOKEN(LTHAN);
 ">"							return TOKEN(GTHAN);
 "<="						return TOKEN(LEQUALS);
 ">="						return TOKEN(GEQUALS);
 "!"							return TOKEN(BANG);
 "!="						return TOKEN(NEQUALS);
+"&&"						return TOKEN(AND);
+"||"						return TOKEN(OR)
+"func"						return TOKEN(FUNC);	
+"if"						return TOKEN(IF);
+"else"						return TOKEN(ELSE);
+"while"						return TOKEN(WHILE);
+"return" 					return TOKEN(RETURN);
+"void"						return TOKEN(VOID);
+"EOF"						return TOKEN(EOF);
 .							printf("Unknown token!\n"); yyterminate();
 
 
