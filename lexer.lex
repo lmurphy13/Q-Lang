@@ -57,6 +57,7 @@ extern "C" int yywrap() { }
 "while"						return TOKEN(WHILE);
 "return" 					return TOKEN(RETURN);
 "void"						return TOKEN(VOID);
+"null"						return TOKEN(NULL);
 "EOF"						return TOKEN(EOF);
 .							printf("Unknown token!\n"); yyterminate();
 

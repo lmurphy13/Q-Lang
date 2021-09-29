@@ -60,6 +60,7 @@
 %token <token> ELSE
 %token <token> WHILE
 %token <token> RETURN
+%token <token> NULL;
 %token <token> VOID;
 %token <token> EOF;
 
@@ -73,7 +74,7 @@
 Program	: MainFunctionDeclaration FunctionDeclarationList EOF { programBlock = $1; programBlock->statements = $2; }
 
 FunctionDeclarationList : FunctionDeclarationList FunctionDeclaration;
-						|
+						| 
 						;
 
 MainFunctionDeclaration : FUNC "int" "main" LPAREN RPAREN LBRACE VariableDeclarationList StatementList RBRACE;
@@ -82,8 +83,8 @@ VariableDeclarationList : VariableDeclarationList VariableDeclaration
 						|
 						;
 
-StatementList : StatementList Statement
-			  |
+StatementList : Statement { $$ = new NBlock(); $$->statements.push_back($<Statement>1); }
+			  | StatementList Statement { $1->statements.push_back($<Statement>2); }
 			  ;
 
 VariableDeclaration : Type TID SEMICOLON
@@ -108,12 +109,13 @@ Type : Type
 	 | TFLOAT
 	 | TSTRING
 	 | TID
+	 | NULL
 	 ;
 
 Statement : LBRACE StatementList RBRACE
 		  | IfStatement
 		  | WHILE LPAREN Expression RPAREN Statement
-		  | Expression ASSIGN Expression 
+		  | Expression ASSIGN Expression SEMICOLON
 		  ;
 
 IfStatement : IF LPAREN Expression RPAREN Statement
@@ -132,4 +134,11 @@ Expression : Expression OR Expression
 		   | Expression PERCENT Expression
 		   | MINUS Expression
 		   | BANG Expression
+		   | LPAREN Expression RPAREN
+		   | TID
+		   | TINTEGER
+		   | TFLOAT
+		   | TSTRING
+		   | TBOOLEAN
+		   | NULL
 		   ;
