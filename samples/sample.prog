@@ -2,7 +2,28 @@ func int main() {
 	int a := 4;
 	bool b := true;
 	float c := 3.14;
-	string hi := "hi";
-
+	string liam := "Liam";
 	int sum := 3 + a;
+
+	fib(40);
+}
+
+func string sayhi() {
+	return "say hi!";
+}
+
+func int fib(int n) {
+	int retval := 0;
+
+	if (n == 0) {
+		retval := 0;
+	}
+
+	if (n == 1) {
+		retval := 1;
+	} else {
+		retval := (fib(n - 2)) + (fib(n - 1));
+	}
+
+	return retval;
 }

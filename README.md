@@ -8,6 +8,8 @@ that creates mischief for the Enterprise crew. This language behaves in a simila
 
 ## Features
 
+Parser Generator: [ANTLR4](https://antlr.org)
+
 This language is still in its initial development stages. There is no currently working version. The hope is to eventually use the LLVM platform to help with code
 generation and portability. This is a side-project and will receive attention when I have the bandwidth to give it.
 

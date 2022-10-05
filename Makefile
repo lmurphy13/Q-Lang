@@ -1,22 +1,14 @@
-CC = gcc
+JAVAC = javac
+ANTLR = /usr/local/lib/antlr-4.11.1-complete.jar
 
-EXEC = qc
-SOURCES = $(wildcard src/*.c)
-LEXSRC = src/lexer.l
-PARSESRC = src/parser.y
-OBJECTS = $(SOURCES:.c=.o)
-CFLAGS = -g -Wall
+SOURCES = src/parser/*.java
+PARSESRC = src/parser/Q.g4
+CLASSES = $(SOURCES:.java=.class)
 
-$(EXEC): $(OBJECTS) $(LEXSRC) $(PARSESRC)
-	flex $(LEXSRC)
-	bison -v -d $(PARSESRC)
-	gcc $(OBJECTS) $(CFLAGS) -o $(EXEC)
-
-%.o: %.c include/%.h
-	gcc -c $(CFLAGS) $< -o $@
+all: $(PARSESRC)
+	java -jar $(ANTLR) $(PARSESRC)
+	$(JAVAC) $(SOURCES)
 
 clean:
-	rm lex.yy.c
-	rm parser.output
-	rm parser.tab.c
-	rm parser.tab.h
+	rm src/parser/*.java
+	rm src/parser/*.class
